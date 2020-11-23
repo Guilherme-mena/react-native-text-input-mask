@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, forwardRef } from 'react'
 
 import {
   TextInput,
@@ -10,9 +10,8 @@ import {
 const mask = NativeModules.RNTextInputMask.mask
 const unmask = NativeModules.RNTextInputMask.unmask
 const setMask = NativeModules.RNTextInputMask.setMask
-export { mask, unmask, setMask }
 
-export default class TextInputMask extends Component {
+class TextInputMask extends Component {
   static defaultProps = {
     maskDefaultValue: true,
   }
@@ -69,3 +68,25 @@ export default class TextInputMask extends Component {
     />);
   }
 }
+
+
+const ForwardedTextInputMask = ({ mask, ...props }, ref) => (
+  <TextInputMask
+    key={mask}
+    {...props}
+    mask={mask}
+    refInput={textInputInstance => {
+      if (ref) {
+        if (typeof ref === "function") {
+          ref(textInputInstance);
+        } else if (typeof ref === "object" && ref != null) {
+          ref.current = textInputInstance;
+        }
+      }
+    }}
+  />
+);
+
+export { mask, unmask, setMask };
+
+export default forwardRef(ForwardedTextInputMask);
